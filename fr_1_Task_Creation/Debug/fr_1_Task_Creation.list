@@ -392,7 +392,7 @@ int main(void)
   xTaskCreate(vGreenLedControllerTask,
  8000506:	2300      	movs	r3, #0
  8000508:	9301      	str	r3, [sp, #4]
- 800050a:	2301      	movs	r3, #1
+ 800050a:	2303      	movs	r3, #3
  800050c:	9300      	str	r3, [sp, #0]
  800050e:	2300      	movs	r3, #0
  8000510:	2264      	movs	r2, #100	; 0x64
@@ -402,12 +402,12 @@ int main(void)
 		  "Green Led Controller",
 		  100,
 		  NULL,
-		  1, NULL);
+		  3, NULL);
 
   xTaskCreate(vRedLedControllerTask,
  800051a:	2300      	movs	r3, #0
  800051c:	9301      	str	r3, [sp, #4]
- 800051e:	2301      	movs	r3, #1
+ 800051e:	2302      	movs	r3, #2
  8000520:	9300      	str	r3, [sp, #0]
  8000522:	2300      	movs	r3, #0
  8000524:	2264      	movs	r2, #100	; 0x64
@@ -417,7 +417,7 @@ int main(void)
  		  "Red Led Controller",
  		  100,
  		  NULL,
- 		  1, NULL);
+ 		  2, NULL);
 
   vTaskStartScheduler();
  800052e:	f002 fe27 	bl	8003180 <vTaskStartScheduler>

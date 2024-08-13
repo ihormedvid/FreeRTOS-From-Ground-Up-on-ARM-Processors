@@ -41,13 +41,13 @@ int main(void)
 		  "Green Led Controller",
 		  100,
 		  NULL,
-		  1, NULL);
+		  3, NULL);
 
   xTaskCreate(vRedLedControllerTask,
  		  "Red Led Controller",
  		  100,
  		  NULL,
- 		  1, NULL);
+ 		  2, NULL);
 
   vTaskStartScheduler();
 
