@@ -457,7 +457,7 @@ int main(void)
 		  100,
 		  NULL,
 		  2,
-		  &receiver_handle);
+		  &sender_handle);
 
   xTaskCreate(SenderTask,
  80005b6:	4b0a      	ldr	r3, [pc, #40]	; (80005e0 <main+0x64>)
@@ -470,7 +470,7 @@ int main(void)
  80005c4:	4808      	ldr	r0, [pc, #32]	; (80005e8 <main+0x6c>)
  80005c6:	f002 fe0e 	bl	80031e6 <xTaskCreate>
 		  1,
-		  &sender_handle);
+		  &receiver_handle);
 
 
 
@@ -481,10 +481,10 @@ int main(void)
   while (1)
  80005ce:	e7fe      	b.n	80005ce <main+0x52>
  80005d0:	200000d4 	.word	0x200000d4
- 80005d4:	200000d0 	.word	0x200000d0
+ 80005d4:	200000cc 	.word	0x200000cc
  80005d8:	08005d24 	.word	0x08005d24
  80005dc:	0800063d 	.word	0x0800063d
- 80005e0:	200000cc 	.word	0x200000cc
+ 80005e0:	200000d0 	.word	0x200000d0
  80005e4:	08005d34 	.word	0x08005d34
  80005e8:	080005ed 	.word	0x080005ed
 

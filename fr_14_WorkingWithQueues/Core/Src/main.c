@@ -40,14 +40,14 @@ int main(void)
 		  100,
 		  NULL,
 		  2,
-		  &receiver_handle);
+		  &sender_handle);
 
   xTaskCreate(SenderTask,
 		  "Sender Task",
 		  100,
 		  NULL,
 		  1,
-		  &sender_handle);
+		  &receiver_handle);
 
 
 
