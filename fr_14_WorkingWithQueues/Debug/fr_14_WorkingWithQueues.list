@@ -29,23 +29,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
  12 .comment      00000043  00000000  00000000  0002009c  2**0
                   CONTENTS, READONLY
- 13 .debug_info   000165a5  00000000  00000000  000200df  2**0
+ 13 .debug_info   00016599  00000000  00000000  000200df  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_abbrev 0000335a  00000000  00000000  00036684  2**0
+ 14 .debug_abbrev 00003346  00000000  00000000  00036678  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_aranges 00001468  00000000  00000000  000399e0  2**3
+ 15 .debug_aranges 00001468  00000000  00000000  000399c0  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_rnglists 00000fd4  00000000  00000000  0003ae48  2**0
+ 16 .debug_rnglists 00000fd4  00000000  00000000  0003ae28  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_macro  000048ed  00000000  00000000  0003be1c  2**0
+ 17 .debug_macro  000048ed  00000000  00000000  0003bdfc  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line   000163ca  00000000  00000000  00040709  2**0
+ 18 .debug_line   000163cd  00000000  00000000  000406e9  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    00099e21  00000000  00000000  00056ad3  2**0
+ 19 .debug_str    00099e26  00000000  00000000  00056ab6  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .debug_frame  00005dbc  00000000  00000000  000f08f4  2**2
+ 20 .debug_frame  00005dbc  00000000  00000000  000f08dc  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000056  00000000  00000000  000f66b0  2**0
+ 21 .debug_line_str 00000056  00000000  00000000  000f6698  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -412,13 +412,29 @@ Disassembly of section .text:
  800057a:	bf00      	nop
 
 0800057c <main>:
+QueueHandle_t yearQueue;
+
+
+
+int main(void)
+{
  800057c:	b580      	push	{r7, lr}
  800057e:	b082      	sub	sp, #8
  8000580:	af02      	add	r7, sp, #8
+
+  HAL_Init();
  8000582:	f000 fb41 	bl	8000c08 <HAL_Init>
+
+  SystemClock_Config();
  8000586:	f000 f89f 	bl	80006c8 <SystemClock_Config>
+
+
+  MX_GPIO_Init();
  800058a:	f000 f925 	bl	80007d8 <MX_GPIO_Init>
+  MX_USART2_UART_Init();
  800058e:	f000 f8f9 	bl	8000784 <MX_USART2_UART_Init>
+
+  yearQueue = xQueueCreate(5 , sizeof(int32_t));
  8000592:	2200      	movs	r2, #0
  8000594:	2104      	movs	r1, #4
  8000596:	2005      	movs	r0, #5
@@ -426,15 +442,24 @@ Disassembly of section .text:
  800059c:	4603      	mov	r3, r0
  800059e:	4a0c      	ldr	r2, [pc, #48]	; (80005d0 <main+0x54>)
  80005a0:	6013      	str	r3, [r2, #0]
+
+
+  xTaskCreate(ReceiverTask,
  80005a2:	4b0c      	ldr	r3, [pc, #48]	; (80005d4 <main+0x58>)
  80005a4:	9301      	str	r3, [sp, #4]
- 80005a6:	2301      	movs	r3, #1
+ 80005a6:	2302      	movs	r3, #2
  80005a8:	9300      	str	r3, [sp, #0]
  80005aa:	2300      	movs	r3, #0
  80005ac:	2264      	movs	r2, #100	; 0x64
  80005ae:	490a      	ldr	r1, [pc, #40]	; (80005d8 <main+0x5c>)
  80005b0:	480a      	ldr	r0, [pc, #40]	; (80005dc <main+0x60>)
  80005b2:	f002 fe18 	bl	80031e6 <xTaskCreate>
+		  100,
+		  NULL,
+		  2,
+		  &receiver_handle);
+
+  xTaskCreate(SenderTask,
  80005b6:	4b0a      	ldr	r3, [pc, #40]	; (80005e0 <main+0x64>)
  80005b8:	9301      	str	r3, [sp, #4]
  80005ba:	2301      	movs	r3, #1
@@ -444,23 +469,44 @@ Disassembly of section .text:
  80005c2:	4908      	ldr	r1, [pc, #32]	; (80005e4 <main+0x68>)
  80005c4:	4808      	ldr	r0, [pc, #32]	; (80005e8 <main+0x6c>)
  80005c6:	f002 fe0e 	bl	80031e6 <xTaskCreate>
+		  1,
+		  &sender_handle);
+
+
+
+  vTaskStartScheduler();
  80005ca:	f002 ff51 	bl	8003470 <vTaskStartScheduler>
+
+
+  while (1)
  80005ce:	e7fe      	b.n	80005ce <main+0x52>
  80005d0:	200000d4 	.word	0x200000d4
- 80005d4:	200000cc 	.word	0x200000cc
+ 80005d4:	200000d0 	.word	0x200000d0
  80005d8:	08005d24 	.word	0x08005d24
- 80005dc:	080005ed 	.word	0x080005ed
- 80005e0:	200000d0 	.word	0x200000d0
- 80005e4:	08005d30 	.word	0x08005d30
- 80005e8:	0800063d 	.word	0x0800063d
+ 80005dc:	0800063d 	.word	0x0800063d
+ 80005e0:	200000cc 	.word	0x200000cc
+ 80005e4:	08005d34 	.word	0x08005d34
+ 80005e8:	080005ed 	.word	0x080005ed
 
 080005ec <SenderTask>:
+  }
+
+}
+
+
+void SenderTask(void *pvParameters){
  80005ec:	b580      	push	{r7, lr}
  80005ee:	b086      	sub	sp, #24
  80005f0:	af00      	add	r7, sp, #0
  80005f2:	6078      	str	r0, [r7, #4]
+
+	int32_t value_to_send = 2050;
  80005f4:	f640 0302 	movw	r3, #2050	; 0x802
  80005f8:	60fb      	str	r3, [r7, #12]
+	BaseType_t qStatus;
+
+	while(1){
+		qStatus = xQueueSend(yearQueue, &value_to_send, 0);
  80005fa:	4b0d      	ldr	r3, [pc, #52]	; (8000630 <SenderTask+0x44>)
  80005fc:	6818      	ldr	r0, [r3, #0]
  80005fe:	f107 010c 	add.w	r1, r7, #12
@@ -468,11 +514,17 @@ Disassembly of section .text:
  8000604:	2200      	movs	r2, #0
  8000606:	f002 f9a9 	bl	800295c <xQueueGenericSend>
  800060a:	6138      	str	r0, [r7, #16]
+
+		if(qStatus != pdPASS) {
  800060c:	693b      	ldr	r3, [r7, #16]
  800060e:	2b01      	cmp	r3, #1
  8000610:	d002      	beq.n	8000618 <SenderTask+0x2c>
+			printf("Error: Data could not be sent... \r\n");
  8000612:	4808      	ldr	r0, [pc, #32]	; (8000634 <SenderTask+0x48>)
  8000614:	f004 fd02 	bl	800501c <puts>
+		}
+
+		for(int i = 0; i < 100000; i++) {}
  8000618:	2300      	movs	r3, #0
  800061a:	617b      	str	r3, [r7, #20]
  800061c:	e002      	b.n	8000624 <SenderTask+0x38>
@@ -483,6 +535,7 @@ Disassembly of section .text:
  8000626:	4a04      	ldr	r2, [pc, #16]	; (8000638 <SenderTask+0x4c>)
  8000628:	4293      	cmp	r3, r2
  800062a:	ddf8      	ble.n	800061e <SenderTask+0x32>
+		qStatus = xQueueSend(yearQueue, &value_to_send, 0);
  800062c:	e7e5      	b.n	80005fa <SenderTask+0xe>
  800062e:	bf00      	nop
  8000630:	200000d4 	.word	0x200000d4
@@ -490,12 +543,23 @@ Disassembly of section .text:
  8000638:	0001869f 	.word	0x0001869f
 
 0800063c <ReceiverTask>:
+	}
+}
+
+void ReceiverTask(void *pvParameters){
  800063c:	b580      	push	{r7, lr}
  800063e:	b086      	sub	sp, #24
  8000640:	af00      	add	r7, sp, #0
  8000642:	6078      	str	r0, [r7, #4]
+
+	int32_t value_received;
+	const TickType_t wait_time = pdMS_TO_TICKS(100);
  8000644:	2364      	movs	r3, #100	; 0x64
  8000646:	617b      	str	r3, [r7, #20]
+	BaseType_t qStatus;
+	while(1){
+
+		qStatus = xQueueReceive(yearQueue, &value_received, wait_time);
  8000648:	4b0a      	ldr	r3, [pc, #40]	; (8000674 <ReceiverTask+0x38>)
  800064a:	681b      	ldr	r3, [r3, #0]
  800064c:	f107 010c 	add.w	r1, r7, #12
@@ -503,37 +567,53 @@ Disassembly of section .text:
  8000652:	4618      	mov	r0, r3
  8000654:	f002 fb1c 	bl	8002c90 <xQueueReceive>
  8000658:	6138      	str	r0, [r7, #16]
+		if(qStatus == pdPASS) {
  800065a:	693b      	ldr	r3, [r7, #16]
  800065c:	2b01      	cmp	r3, #1
  800065e:	d105      	bne.n	800066c <ReceiverTask+0x30>
+			printf("The value received id: %ld...\r\n", value_received);
  8000660:	68fb      	ldr	r3, [r7, #12]
  8000662:	4619      	mov	r1, r3
  8000664:	4804      	ldr	r0, [pc, #16]	; (8000678 <ReceiverTask+0x3c>)
  8000666:	f004 fc73 	bl	8004f50 <iprintf>
  800066a:	e7ed      	b.n	8000648 <ReceiverTask+0xc>
+		} else {
+			printf("Error! Could not receive...\r\n");
  800066c:	4803      	ldr	r0, [pc, #12]	; (800067c <ReceiverTask+0x40>)
  800066e:	f004 fcd5 	bl	800501c <puts>
+		qStatus = xQueueReceive(yearQueue, &value_received, wait_time);
  8000672:	e7e9      	b.n	8000648 <ReceiverTask+0xc>
  8000674:	200000d4 	.word	0x200000d4
  8000678:	08005d64 	.word	0x08005d64
  800067c:	08005d84 	.word	0x08005d84
 
 08000680 <uart2_wrtie>:
+		}
+
+	}
+}
+
+int uart2_wrtie(int ch) {
  8000680:	b480      	push	{r7}
  8000682:	b083      	sub	sp, #12
  8000684:	af00      	add	r7, sp, #0
  8000686:	6078      	str	r0, [r7, #4]
+	while(!(USART2->SR &0x0080)) {}
  8000688:	bf00      	nop
  800068a:	4b08      	ldr	r3, [pc, #32]	; (80006ac <uart2_wrtie+0x2c>)
  800068c:	681b      	ldr	r3, [r3, #0]
  800068e:	f003 0380 	and.w	r3, r3, #128	; 0x80
  8000692:	2b00      	cmp	r3, #0
  8000694:	d0f9      	beq.n	800068a <uart2_wrtie+0xa>
+	USART2->DR = (ch & 0xFF);
  8000696:	687b      	ldr	r3, [r7, #4]
  8000698:	4a04      	ldr	r2, [pc, #16]	; (80006ac <uart2_wrtie+0x2c>)
  800069a:	b2db      	uxtb	r3, r3
  800069c:	6053      	str	r3, [r2, #4]
+
+	return ch;
  800069e:	687b      	ldr	r3, [r7, #4]
+}
  80006a0:	4618      	mov	r0, r3
  80006a2:	370c      	adds	r7, #12
  80006a4:	46bd      	mov	sp, r7
@@ -542,27 +622,45 @@ Disassembly of section .text:
  80006ac:	40004400 	.word	0x40004400
 
 080006b0 <__io_putchar>:
+
+
+int __io_putchar(int ch){
  80006b0:	b580      	push	{r7, lr}
  80006b2:	b082      	sub	sp, #8
  80006b4:	af00      	add	r7, sp, #0
  80006b6:	6078      	str	r0, [r7, #4]
+	//HAL_UART_Transmit(&huart2, (uint8_t *)&ch,1,0xFFFF);
+	uart2_wrtie(ch);
  80006b8:	6878      	ldr	r0, [r7, #4]
  80006ba:	f7ff ffe1 	bl	8000680 <uart2_wrtie>
+	return ch;
  80006be:	687b      	ldr	r3, [r7, #4]
+
+//	for (uint32_t i = 0; i < 1000; i++) {
+//	        __NOP();
+//	}
+}
  80006c0:	4618      	mov	r0, r3
  80006c2:	3708      	adds	r7, #8
  80006c4:	46bd      	mov	sp, r7
  80006c6:	bd80      	pop	{r7, pc}
 
 080006c8 <SystemClock_Config>:
+
+
+
+void SystemClock_Config(void)
+{
  80006c8:	b580      	push	{r7, lr}
  80006ca:	b094      	sub	sp, #80	; 0x50
  80006cc:	af00      	add	r7, sp, #0
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
  80006ce:	f107 0320 	add.w	r3, r7, #32
  80006d2:	2230      	movs	r2, #48	; 0x30
  80006d4:	2100      	movs	r1, #0
  80006d6:	4618      	mov	r0, r3
  80006d8:	f004 fd80 	bl	80051dc <memset>
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
  80006dc:	f107 030c 	add.w	r3, r7, #12
  80006e0:	2200      	movs	r2, #0
  80006e2:	601a      	str	r2, [r3, #0]
@@ -570,6 +668,10 @@ Disassembly of section .text:
  80006e6:	609a      	str	r2, [r3, #8]
  80006e8:	60da      	str	r2, [r3, #12]
  80006ea:	611a      	str	r2, [r3, #16]
+
+  /** Configure the main internal regulator output voltage
+  */
+  __HAL_RCC_PWR_CLK_ENABLE();
  80006ec:	2300      	movs	r3, #0
  80006ee:	60bb      	str	r3, [r7, #8]
  80006f0:	4b22      	ldr	r3, [pc, #136]	; (800077c <SystemClock_Config+0xb4>)
@@ -582,6 +684,7 @@ Disassembly of section .text:
  8000700:	f003 5380 	and.w	r3, r3, #268435456	; 0x10000000
  8000704:	60bb      	str	r3, [r7, #8]
  8000706:	68bb      	ldr	r3, [r7, #8]
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
  8000708:	2300      	movs	r3, #0
  800070a:	607b      	str	r3, [r7, #4]
  800070c:	4b1c      	ldr	r3, [pc, #112]	; (8000780 <SystemClock_Config+0xb8>)
@@ -594,31 +697,54 @@ Disassembly of section .text:
  800071c:	f403 4340 	and.w	r3, r3, #49152	; 0xc000
  8000720:	607b      	str	r3, [r7, #4]
  8000722:	687b      	ldr	r3, [r7, #4]
+
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
  8000724:	2302      	movs	r3, #2
  8000726:	623b      	str	r3, [r7, #32]
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
  8000728:	2301      	movs	r3, #1
  800072a:	62fb      	str	r3, [r7, #44]	; 0x2c
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
  800072c:	2310      	movs	r3, #16
  800072e:	633b      	str	r3, [r7, #48]	; 0x30
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
  8000730:	2300      	movs	r3, #0
  8000732:	63bb      	str	r3, [r7, #56]	; 0x38
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
  8000734:	f107 0320 	add.w	r3, r7, #32
  8000738:	4618      	mov	r0, r3
  800073a:	f000 fd0d 	bl	8001158 <HAL_RCC_OscConfig>
  800073e:	4603      	mov	r3, r0
  8000740:	2b00      	cmp	r3, #0
  8000742:	d001      	beq.n	8000748 <SystemClock_Config+0x80>
+  {
+    Error_Handler();
  8000744:	f000 f874 	bl	8000830 <Error_Handler>
+  }
+
+  /** Initializes the CPU, AHB and APB buses clocks
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
  8000748:	230f      	movs	r3, #15
  800074a:	60fb      	str	r3, [r7, #12]
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
  800074c:	2300      	movs	r3, #0
  800074e:	613b      	str	r3, [r7, #16]
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
  8000750:	2300      	movs	r3, #0
  8000752:	617b      	str	r3, [r7, #20]
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
  8000754:	2300      	movs	r3, #0
  8000756:	61bb      	str	r3, [r7, #24]
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
  8000758:	2300      	movs	r3, #0
  800075a:	61fb      	str	r3, [r7, #28]
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
  800075c:	f107 030c 	add.w	r3, r7, #12
  8000760:	2100      	movs	r1, #0
  8000762:	4618      	mov	r0, r3
@@ -626,7 +752,11 @@ Disassembly of section .text:
  8000768:	4603      	mov	r3, r0
  800076a:	2b00      	cmp	r3, #0
  800076c:	d001      	beq.n	8000772 <SystemClock_Config+0xaa>
+  {
+    Error_Handler();
  800076e:	f000 f85f 	bl	8000830 <Error_Handler>
+  }
+}
  8000772:	bf00      	nop
  8000774:	3750      	adds	r7, #80	; 0x50
  8000776:	46bd      	mov	sp, r7
@@ -636,38 +766,66 @@ Disassembly of section .text:
  8000780:	40007000 	.word	0x40007000
 
 08000784 <MX_USART2_UART_Init>:
+  * @brief USART2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART2_UART_Init(void)
+{
  8000784:	b580      	push	{r7, lr}
  8000786:	af00      	add	r7, sp, #0
+  /* USER CODE END USART2_Init 0 */
+
+  /* USER CODE BEGIN USART2_Init 1 */
+
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
  8000788:	4b11      	ldr	r3, [pc, #68]	; (80007d0 <MX_USART2_UART_Init+0x4c>)
  800078a:	4a12      	ldr	r2, [pc, #72]	; (80007d4 <MX_USART2_UART_Init+0x50>)
  800078c:	601a      	str	r2, [r3, #0]
+  huart2.Init.BaudRate = 115200;
  800078e:	4b10      	ldr	r3, [pc, #64]	; (80007d0 <MX_USART2_UART_Init+0x4c>)
  8000790:	f44f 32e1 	mov.w	r2, #115200	; 0x1c200
  8000794:	605a      	str	r2, [r3, #4]
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
  8000796:	4b0e      	ldr	r3, [pc, #56]	; (80007d0 <MX_USART2_UART_Init+0x4c>)
  8000798:	2200      	movs	r2, #0
  800079a:	609a      	str	r2, [r3, #8]
+  huart2.Init.StopBits = UART_STOPBITS_1;
  800079c:	4b0c      	ldr	r3, [pc, #48]	; (80007d0 <MX_USART2_UART_Init+0x4c>)
  800079e:	2200      	movs	r2, #0
  80007a0:	60da      	str	r2, [r3, #12]
+  huart2.Init.Parity = UART_PARITY_NONE;
  80007a2:	4b0b      	ldr	r3, [pc, #44]	; (80007d0 <MX_USART2_UART_Init+0x4c>)
  80007a4:	2200      	movs	r2, #0
  80007a6:	611a      	str	r2, [r3, #16]
+  huart2.Init.Mode = UART_MODE_TX_RX;
  80007a8:	4b09      	ldr	r3, [pc, #36]	; (80007d0 <MX_USART2_UART_Init+0x4c>)
  80007aa:	220c      	movs	r2, #12
  80007ac:	615a      	str	r2, [r3, #20]
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
  80007ae:	4b08      	ldr	r3, [pc, #32]	; (80007d0 <MX_USART2_UART_Init+0x4c>)
  80007b0:	2200      	movs	r2, #0
  80007b2:	619a      	str	r2, [r3, #24]
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
  80007b4:	4b06      	ldr	r3, [pc, #24]	; (80007d0 <MX_USART2_UART_Init+0x4c>)
  80007b6:	2200      	movs	r2, #0
  80007b8:	61da      	str	r2, [r3, #28]
+  if (HAL_UART_Init(&huart2) != HAL_OK)
  80007ba:	4805      	ldr	r0, [pc, #20]	; (80007d0 <MX_USART2_UART_Init+0x4c>)
  80007bc:	f001 fbd6 	bl	8001f6c <HAL_UART_Init>
  80007c0:	4603      	mov	r3, r0
  80007c2:	2b00      	cmp	r3, #0
  80007c4:	d001      	beq.n	80007ca <MX_USART2_UART_Init+0x46>
+  {
+    Error_Handler();
  80007c6:	f000 f833 	bl	8000830 <Error_Handler>
+  }
+  /* USER CODE BEGIN USART2_Init 2 */
+
+  /* USER CODE END USART2_Init 2 */
+
+}
  80007ca:	bf00      	nop
  80007cc:	bd80      	pop	{r7, pc}
  80007ce:	bf00      	nop
@@ -675,9 +833,20 @@ Disassembly of section .text:
  80007d4:	40004400 	.word	0x40004400
 
 080007d8 <MX_GPIO_Init>:
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPIO_Init(void)
+{
  80007d8:	b480      	push	{r7}
  80007da:	b083      	sub	sp, #12
  80007dc:	af00      	add	r7, sp, #0
+/* USER CODE BEGIN MX_GPIO_Init_1 */
+/* USER CODE END MX_GPIO_Init_1 */
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOA_CLK_ENABLE();
  80007de:	2300      	movs	r3, #0
  80007e0:	607b      	str	r3, [r7, #4]
  80007e2:	4b09      	ldr	r3, [pc, #36]	; (8000808 <MX_GPIO_Init+0x30>)
@@ -690,6 +859,10 @@ Disassembly of section .text:
  80007f2:	f003 0301 	and.w	r3, r3, #1
  80007f6:	607b      	str	r3, [r7, #4]
  80007f8:	687b      	ldr	r3, [r7, #4]
+
+/* USER CODE BEGIN MX_GPIO_Init_2 */
+/* USER CODE END MX_GPIO_Init_2 */
+}
  80007fa:	bf00      	nop
  80007fc:	370c      	adds	r7, #12
  80007fe:	46bd      	mov	sp, r7
@@ -699,16 +872,32 @@ Disassembly of section .text:
  8000808:	40023800 	.word	0x40023800
 
 0800080c <HAL_TIM_PeriodElapsedCallback>:
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
  800080c:	b580      	push	{r7, lr}
  800080e:	b082      	sub	sp, #8
  8000810:	af00      	add	r7, sp, #0
  8000812:	6078      	str	r0, [r7, #4]
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM1) {
  8000814:	687b      	ldr	r3, [r7, #4]
  8000816:	681b      	ldr	r3, [r3, #0]
  8000818:	4a04      	ldr	r2, [pc, #16]	; (800082c <HAL_TIM_PeriodElapsedCallback+0x20>)
  800081a:	4293      	cmp	r3, r2
  800081c:	d101      	bne.n	8000822 <HAL_TIM_PeriodElapsedCallback+0x16>
+    HAL_IncTick();
  800081e:	f000 fa15 	bl	8000c4c <HAL_IncTick>
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
  8000822:	bf00      	nop
  8000824:	3708      	adds	r7, #8
  8000826:	46bd      	mov	sp, r7
@@ -717,10 +906,27 @@ Disassembly of section .text:
  800082c:	40010000 	.word	0x40010000
 
 08000830 <Error_Handler>:
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
+void Error_Handler(void)
+{
  8000830:	b480      	push	{r7}
  8000832:	af00      	add	r7, sp, #0
+  \details Disables IRQ interrupts by setting the I-bit in the CPSR.
+           Can only be executed in Privileged modes.
+ */
+__STATIC_FORCEINLINE void __disable_irq(void)
+{
+  __ASM volatile ("cpsid i" : : : "memory");
  8000834:	b672      	cpsid	i
+}
  8000836:	bf00      	nop
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
+  __disable_irq();
+  while (1)
  8000838:	e7fe      	b.n	8000838 <Error_Handler+0x8>
 	...
 

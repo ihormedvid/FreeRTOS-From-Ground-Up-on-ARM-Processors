@@ -34,6 +34,14 @@ int main(void)
 
   yearQueue = xQueueCreate(5 , sizeof(int32_t));
 
+
+  xTaskCreate(ReceiverTask,
+		  "Receiver Task",
+		  100,
+		  NULL,
+		  2,
+		  &receiver_handle);
+
   xTaskCreate(SenderTask,
 		  "Sender Task",
 		  100,
@@ -41,12 +49,7 @@ int main(void)
 		  1,
 		  &sender_handle);
 
-  xTaskCreate(ReceiverTask,
-		  "Receiver Task",
-		  100,
-		  NULL,
-		  1,
-		  &receiver_handle);
+
 
   vTaskStartScheduler();
 
@@ -106,9 +109,9 @@ int __io_putchar(int ch){
 	uart2_wrtie(ch);
 	return ch;
 
-	for (uint32_t i = 0; i < 1000; i++) {
-	        __NOP(); // або інша коротка затримка
-	}
+//	for (uint32_t i = 0; i < 1000; i++) {
+//	        __NOP();
+//	}
 }
 
 
