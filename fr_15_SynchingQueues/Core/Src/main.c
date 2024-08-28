@@ -48,7 +48,7 @@ int main(void)
   // Lower than the receiver task priority
 
   xTaskCreate(SenderTask1,
-		  "Sender Task2",
+		  "Sender Task1",
 		  100,
 		  NULL,
 		  1,

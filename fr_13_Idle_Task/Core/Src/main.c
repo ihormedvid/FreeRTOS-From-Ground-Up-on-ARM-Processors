@@ -86,6 +86,8 @@ void vGreenLedControllerTask(void *pvParameters){
 }
 
 void vApplicationIdleHook(void) {
+
+	// Do something
 	IdleTaskProfiler++;
 }
 int __io_putchar(int ch){

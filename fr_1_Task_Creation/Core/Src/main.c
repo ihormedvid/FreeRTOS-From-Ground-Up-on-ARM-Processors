@@ -18,7 +18,7 @@ void vGreenLedControllerTask(void *pvParameters);
 
 typedef uint32_t TaskPrifiler;
 
-TaskPrifiler BlueTaskProfiler, RedTaskProfiler, GreenTaskProfiler;
+TaskPrifiler BlueTaskProfiler, RedTaskProfiler, GreenTaskProfiler, IdleTaskProfiler;
 
 int main(void)
 {
@@ -83,6 +83,10 @@ void vGreenLedControllerTask(void *pvParameters){
 int __io_putchar(int ch){
 	HAL_UART_Transmit(&huart2, (uint8_t *)&ch,1,0xFFFF);
 	return ch;
+}
+
+void vApplicationIdleHook(void) {
+	IdleTaskProfiler++;
 }
 
 void SystemClock_Config(void)

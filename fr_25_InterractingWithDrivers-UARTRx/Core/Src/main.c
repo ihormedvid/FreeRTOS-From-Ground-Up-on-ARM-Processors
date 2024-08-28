@@ -56,8 +56,7 @@ int main(void)
 
   while (1)
   {
-	  btn_state = read_digital_sensor();
-	  sensor_value = read_analog_sensor();
+
 
 
 

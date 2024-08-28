@@ -488,28 +488,27 @@ int main(void)
  80005e0:	4603      	mov	r3, r0
  80005e2:	4a11      	ldr	r2, [pc, #68]	; (8000628 <main+0xac>)
  80005e4:	6013      	str	r3, [r2, #0]
-  xTimer2Started = xTimerStart(xAutoReloadTimer,0);
+  xTimer2Started = xTimerStart(xAutoReloadTimer,10000);
  80005e6:	4b0f      	ldr	r3, [pc, #60]	; (8000624 <main+0xa8>)
  80005e8:	681c      	ldr	r4, [r3, #0]
  80005ea:	f002 ffd5 	bl	8003598 <xTaskGetTickCount>
  80005ee:	4602      	mov	r2, r0
- 80005f0:	2300      	movs	r3, #0
- 80005f2:	9300      	str	r3, [sp, #0]
- 80005f4:	2300      	movs	r3, #0
- 80005f6:	2101      	movs	r1, #1
- 80005f8:	4620      	mov	r0, r4
- 80005fa:	f003 fc87 	bl	8003f0c <xTimerGenericCommand>
- 80005fe:	4603      	mov	r3, r0
- 8000600:	4a0a      	ldr	r2, [pc, #40]	; (800062c <main+0xb0>)
- 8000602:	6013      	str	r3, [r2, #0]
+ 80005f0:	f242 7310 	movw	r3, #10000	; 0x2710
+ 80005f4:	9300      	str	r3, [sp, #0]
+ 80005f6:	2300      	movs	r3, #0
+ 80005f8:	2101      	movs	r1, #1
+ 80005fa:	4620      	mov	r0, r4
+ 80005fc:	f003 fc86 	bl	8003f0c <xTimerGenericCommand>
+ 8000600:	4603      	mov	r3, r0
+ 8000602:	4a0a      	ldr	r2, [pc, #40]	; (800062c <main+0xb0>)
+ 8000604:	6013      	str	r3, [r2, #0]
 
   vTaskStartScheduler();
- 8000604:	f002 feb6 	bl	8003374 <vTaskStartScheduler>
+ 8000606:	f002 feb5 	bl	8003374 <vTaskStartScheduler>
 
 
   while (1)
- 8000608:	e7fe      	b.n	8000608 <main+0x8c>
- 800060a:	bf00      	nop
+ 800060a:	e7fe      	b.n	800060a <main+0x8e>
  800060c:	08005c30 	.word	0x08005c30
  8000610:	08000631 	.word	0x08000631
  8000614:	08005c48 	.word	0x08005c48

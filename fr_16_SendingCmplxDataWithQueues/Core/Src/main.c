@@ -4,6 +4,7 @@
 
 
 UART_HandleTypeDef huart2;
+typedef uint32_t TaskProfiler;
 
 
 void SystemClock_Config(void);
@@ -23,15 +24,10 @@ typedef struct {
 } Data_t;
 
 // Declare two "Data_t" variables that will be passed to the queue
-static const Data_t xStructsToSend [ 2 ] =
-{
-		{77, humidity_sensor }, // Used by humidity_sensor
-		{63, pressure_sensor }  // Used by pressure_sensor
-};
+static const Data_t xStructstoSend[2] = { {12, humidity_sensor} , {45, pressure_sensor} };
+TaskHandle_t  hum_task_handle, press_task_handle, receiver_handle;
 
-TaskHandle_t hum_task_handle, press_task_handle, receiver_handle;
-
-QueueHandle_t xQueue;
+QueueHandle_t  xQueue;
 
 void SenderTask(void *pvParmaters);
 void ReceiverTask(void *pvParmaters);
@@ -50,35 +46,22 @@ int main(void)
   // Create queue to hold a maximum of 3 structures
 
   xQueue = xQueueCreate(3, sizeof(Data_t));
-
   // Create a receiver task with a priority of 1
 
-  xTaskCreate(ReceiverTask,
-		  "Receiver Task",
-		  100,
-		  NULL,
-		  1,
-		  &receiver_handle);
+	xTaskCreate(ReceiverTask, "Receiver Task", 100, NULL, 1, &receiver_handle);
+
 
   // Create task to send humidity data with a priority of 2
 
-  xTaskCreate(SenderTask,
-		  "Humidity Sender Task",
-		  100,
-		  (void *)&(xStructsToSend[0]),
-		  2,
-		  &hum_task_handle);
+	xTaskCreate(SenderTask, "Humidity Sender Task", 100, (void *) &(xStructstoSend[0]), 2, &hum_task_handle);
+
 
   // Create task to send pressure data with a priority of 2
 
-  xTaskCreate(SenderTask,
-		  "Pressure Sender Task",
-		  100,
-		  (void *)&(xStructsToSend[1]),
-		  2,
-		  &press_task_handle);
+	xTaskCreate(SenderTask, "Pressure Sender Task", 100, (void *) &(xStructstoSend[1]), 2, &press_task_handle);
 
-  vTaskStartScheduler();
+
+	vTaskStartScheduler();
 
   while (1)
   {
@@ -88,40 +71,49 @@ int main(void)
 
 }
 
-void SenderTask(void *pvParmaters) {
-
+void SenderTask(void *pvParams)
+{
 	BaseType_t qStatus;
+	const TickType_t wait_time = pdMS_TO_TICKS(100);
 
-	// Enter the blocked state for 200ms for space to become available in the queue each
-	// time the queue is full
+	while(1)
+	{
+		qStatus = xQueueSend(xQueue,pvParams, wait_time); // if the queue is full , then wait for the 'wait_time' until it gets a new slot
 
-	const TickType_t wait_time = pdMS_TO_TICKS(200);
-
-	while(1){
-
-		qStatus = xQueueSend(xQueue, pvParmaters, wait_time);
-		if(qStatus != pdPASS) {
-			// Do something..
+		if(qStatus != pdPASS)
+		{
+			//Do something cause it is an error
 		}
-		for(int i = 0; i < 100000; i++) {}
+
+		for(int i=0; i<100000; i++);
 	}
+
 }
-
-void ReceiverTask(void *pvParmaters) {
-	Data_t xReceivedStructure;
-
+void ReceiverTask(void *pvParams)
+{
 	BaseType_t qStatus;
+	Data_t xStructReceived;
 
-	while(1) {
-		qStatus = xQueueReceive(xQueue, &xReceivedStructure, 0);
-		if(qStatus == pdPASS) {
-			if( xReceivedStructure.sDataSource == humidity_sensor) {
-				printf("Humidity sensor value = %d \n\r", xReceivedStructure.ucValue);
-			} else {
-				printf("Pressure sensor value = %d \n\r", xReceivedStructure.ucValue);
+	while(1)
+	{
+		qStatus = xQueueReceive(xQueue, &xStructReceived, 0);
+
+		//Determine to which member of the struct refers the incoming data
+
+		if(qStatus == pdPASS)
+		{
+			if(xStructReceived.sDataSource == humidity_sensor)
+			{
+				printf("The value read by the humidity sensor = %d. \r\n", xStructReceived.ucValue);
 			}
-		} else {
-			// Do something...
+			else
+			{
+				printf("The value read by the pressure sensor = %d. \r\n", xStructReceived.ucValue);
+			}
+		}
+		else
+		{
+			//some error occurred upon receiving data
 		}
 	}
 }
