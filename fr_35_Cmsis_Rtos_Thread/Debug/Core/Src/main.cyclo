@@ -1,0 +1,12 @@
+../Core/Src/main.c:24:5:main	1
+../Core/Src/main.c:83:6:vRedLedControllerTask	2
+../Core/Src/main.c:92:6:vOrangeLedControllerTask	2
+../Core/Src/main.c:101:6:vGreenLedControllerTask	2
+../Core/Src/main.c:110:6:vBlueLedControllerTask	2
+../Core/Src/main.c:120:5:USART2_write	2
+../Core/Src/main.c:128:5:__io_putchar	1
+../Core/Src/main.c:134:6:SystemClock_Config	3
+../Core/Src/main.c:176:13:MX_USART2_UART_Init	2
+../Core/Src/main.c:209:13:MX_GPIO_Init	1
+../Core/Src/main.c:242:6:HAL_TIM_PeriodElapsedCallback	2
+../Core/Src/main.c:259:6:Error_Handler	1
