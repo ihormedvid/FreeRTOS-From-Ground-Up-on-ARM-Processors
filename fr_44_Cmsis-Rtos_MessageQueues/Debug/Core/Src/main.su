@@ -1,0 +1,14 @@
+../Core/Src/main.c:45:5:main	152	static
+../Core/Src/main.c:114:6:vRedLedControllerTask	24	static
+../Core/Src/main.c:127:6:vOrangeLedControllerTask	16	static
+../Core/Src/main.c:136:6:vGreenLedControllerTask	16	static
+../Core/Src/main.c:147:6:vBlueLedControllerTask	16	static
+../Core/Src/main.c:164:6:Timer1_Callback	16	static
+../Core/Src/main.c:168:6:Timer2_Callback	16	static
+../Core/Src/main.c:172:5:USART2_write	16	static
+../Core/Src/main.c:180:5:__io_putchar	16	static
+../Core/Src/main.c:186:6:SystemClock_Config	88	static
+../Core/Src/main.c:228:13:MX_USART2_UART_Init	8	static
+../Core/Src/main.c:261:13:MX_GPIO_Init	16	static
+../Core/Src/main.c:294:6:HAL_TIM_PeriodElapsedCallback	16	static
+../Core/Src/main.c:311:6:Error_Handler	4	static,ignoring_inline_asm
